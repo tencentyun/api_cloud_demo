@@ -1,0 +1,6 @@
+[
+ {
+    "name":"cosClient",
+    "class":"CosClient",
+ }
+]

@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width"/>
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>WinC</title>
+    <link rel="stylesheet" type="text/css" href="css/api.css" />
+    <link rel="stylesheet" type="text/css" href="css/box.css" />
+    <script type="text/javascript" src="script/public.js"></script>
+    <style>
+    	html,body{
+		height: 100%
+	}
+	body{
+		background-color: #fff;
+	    margin: 0;
+	}
+	#wrap{
+	    height: 100%;
+	    position: relative;
+	}
+	#header{
+		background-color: #5082c2;
+		height: 44px;
+	    position: relative;
+	}
+	#header h1{
+	    font-size: 20px;
+	    height: 44px;
+	    line-height: 44px;
+	    margin: 0em;
+	    color: #fff;
+		margin-left: 100px;
+		margin-right: 100px;
+		text-align: center;
+	}
+    #main{
+        display: block;
+    }
+    a.button{
+        display: -webkit-box;
+        -webkit-box-pack: center;
+        -webkit-box-align: center;
+        height: 36px;
+        margin: 8px;
+        background-color: rgba(240,240,240,1.0);
+        border-color: rgba(220,220,220,1.0);
+        border-width: 2px;
+        border-style: solid;
+	}
+    a.active{
+        background-color: rgba(240,240,240,0.6);
+	}
+    </style>
+	<script type="text/javascript">
+
+    var secretID = "***";
+    var secretKey = "***";
+
+    function initCos(){
+        var demo = api.require('cosClient');
+        demo.setupPermanentCredentail({"secretID":secretID,"secretKey":secretKey});
+        demo.registerServiceForKey({"serviceKey":"test","useHttps":true})
+    }
+
+    function getBucketList() {
+        var demo = api.require('cosClient');
+        demo.getBucketList({"serviceKey":"test"},function(ret,err){
+           if(err != ""){
+                       alert(err.data);
+           }else{
+               alert(ret.data);
+           }
+        });
+    }
+
+    function deleteBucket() {
+        var demo = api.require('cosClient');
+        demo.deleteBucket({"serviceKey":"test",
+            "region":"ap-chengdu",
+            "bucket":"0-1253960454",},function(ret,err){
+             if(err != ""){
+                           alert(err.data);
+                       }else{
+                           alert(ret.result);
+                       }
+        });
+    }
+
+
+    function listBucketContent() {
+
+              var demo = api.require('cosClient');
+
+               demo.listBucketContent({"serviceKey":"test","bucket":"0-1253960454","region":"ap-chengdu"},function(ret,err){
+                    if(err != ""){
+                           alert(err.data);
+                       }else{
+                           alert(ret.data);
+                       }
+               });
+           }
+
+
+    var downloadTaskId;
+    function downloadObject() {
+        var demo = api.require('cosClient');
+
+        demo.downloadObject({
+            "serviceKey":"test",
+            "region":"ap-chengdu",
+            "bucket":"0-1253960454",
+            "object":"example1665987337898.gif"},function(ret,err){
+             if(err != ""){
+                           alert(err.data);
+                       }else{
+                           if(ret.result == "begin"){
+                                downloadTaskId = JSON.parse(ret.data).taskId;
+                                alert(downloadTaskId);
+                            }
+                       }
+        });
+    }
+
+    function pauseDownload(){
+        var demo = api.require('cosClient');
+        alert(downloadTaskId);
+        demo.pauseDownloadObject({"taskId":downloadTaskId});
+    }
+
+    var uploadTaskId;
+    function uploadObject() {
+        var demo = api.require('cosClient');
+
+        demo.uploadObject({
+            "serviceKey":"test",
+            "region":"ap-chengdu",
+            "bucket":"0-1253960454",
+            "object":"test123.gif"},function(ret,err){
+                if(err != ""){
+                    alert(err.data);
+                }else{
+                    if(ret.result == "begin"){
+                        uploadTaskId = JSON.parse(ret.data).taskId;
+                        alert(uploadTaskId);
+                    }
+                }
+        });
+    }
+
+    function pauseUpload(){
+        var demo = api.require('cosClient');
+        alert(uploadTaskId);
+        demo.pauseUploadObject({"taskId":uploadTaskId});
+    }
+
+    function deleteObject() {
+
+              var demo = api.require('cosClient');
+
+               demo.deleteObject({
+                   "serviceKey":"test",
+                   "region":"ap-chengdu",
+                   "bucket":"0-1253960454",
+                   "object":"preview.pdf"},function(ret,err){
+                    if(err != ""){
+                           alert(err.data);
+                       }else{
+                           alert(ret.result);
+                       }
+               });
+           }
+
+    function headObject() {
+
+              var demo = api.require('cosClient');
+
+               demo.headObject({
+                   "serviceKey":"test",
+                   "region":"ap-chengdu",
+                   "bucket":"0-1253960454",
+                   "object":"02_常用语法.pdf"},function(ret,err){
+                    if(err != ""){
+                           alert(err.data);
+                       }else{
+                           alert(ret.data);
+                       }
+               });
+           }
+
+    function createBucket() {
+
+              var demo = api.require('cosClient');
+
+               demo.createBucket({
+                    "serviceKey":"test",
+                   "name":"apicloudtest",
+                   "appId":"1253960454",
+                   "region":"ap-chengdu"},function(ret,err){
+                    if(err != ""){
+                           alert(err.data);
+                       }else{
+                           alert(ret.result);
+                       }
+               });
+           }
+
+	</script>
+</head>
+<body>
+    <div id="wrap">
+        <header id="header">
+            <h1 id="title">模块开发</h1>
+        </header>
+        <div id="main">
+            <a class="button" tapmode="active" onclick="initCos()">初始化cos</a>
+            <a class="button" tapmode="active" onclick="getBucketList()">getBucketList</a>
+            <a class="button" tapmode="active" onclick="listBucketContent()">listBucketContent</a>
+            <a class="button" tapmode="active" onclick="downloadObject()">downloadObject</a>
+            <a class="button" tapmode="active" onclick="pauseDownload()">pauseDownload</a>
+            <a class="button" tapmode="active" onclick="uploadObject()">uploadObject</a>
+            <a class="button" tapmode="active" onclick="pauseUpload()">pauseUpload</a>
+            <a class="button" tapmode="active" onclick="deleteObject()">deleteObject</a>
+            <a class="button" tapmode="active" onclick="headObject()">headObject</a>
+            <a class="button" tapmode="active" onclick="deleteBucket()">deleteBucket</a>
+            <a class="button" tapmode="active" onclick="createBucket()">createBucket</a>
+        </div>
+    </div>
+</body>
+</html>
