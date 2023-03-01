@@ -10,6 +10,7 @@
 #import <QCloudCore/QCloudConfiguration_Private.h>
 #import "CredentailProvider.h"
 
+#define CLIENT_VERSION @"1.0.1"
 static CosClient* _instance;
 
 @interface CosClient ()<CredentailProviderDelegate>
@@ -106,17 +107,17 @@ JS_METHOD(registerServiceForKey:(UZModuleMethodContext *)context) {
     NSString * serviceName = context.param[@"serviceName"];
     NSString * suffix = context.param[@"suffix"];
     BOOL useHttps = context.param[@"useHttps"] == nil ? YES :[context.param[@"useHttps"] boolValue];
-    
-    
-    
+
     QCloudServiceConfiguration* configuration = [QCloudServiceConfiguration new];
     
-    NSString * userAgent = context.param[@"userAgent"];
-    if(userAgent.length == 0){
-        userAgent = @"apicloud_ios";
+    NSString * userAgent = @"cos-xml-ios-sdk-v6.1.7-apicloud_ios";
+    NSString *customAgent = context.param[@"userAgent"];
+    if(customAgent.length != 0){
+        userAgent = [userAgent stringByAppendingString:@"-"];
+        userAgent =[userAgent stringByAppendingString:customAgent];
     }
     configuration.userAgentProductKey = userAgent;
-    
+    configuration.productVersion = CLIENT_VERSION;
     QCloudCOSXMLEndPoint* endpoint = [[QCloudCOSXMLEndPoint alloc] init];
     endpoint.useHTTPS = useHttps;
     if(serviceName.length > 0){
@@ -159,11 +160,14 @@ JS_METHOD(registerTransferManger:(UZModuleMethodContext *)context) {
     
     QCloudServiceConfiguration* configuration = [QCloudServiceConfiguration new];
     
-    NSString * userAgent = context.param[@"userAgent"];
-    if(userAgent.length == 0){
-        userAgent = @"apicloud_ios";
+    NSString * userAgent = @"cos-xml-ios-sdk-v6.1.7-apicloud_ios";
+    NSString *customAgent = context.param[@"userAgent"];
+    if(customAgent.length != 0){
+        userAgent = [userAgent stringByAppendingString:@"-"];
+        userAgent = [userAgent stringByAppendingString:customAgent];
     }
     configuration.userAgentProductKey = userAgent;
+    configuration.productVersion = CLIENT_VERSION;
     
     QCloudCOSXMLEndPoint* endpoint = [[QCloudCOSXMLEndPoint alloc] init];
     endpoint.useHTTPS = useHttps;

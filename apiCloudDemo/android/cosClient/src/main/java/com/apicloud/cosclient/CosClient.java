@@ -89,7 +89,7 @@ public class CosClient extends UZModule {
 
 
     private static final String TAG = "CosClient";
-
+    private static final String CLIENT_VERSION = "1.0.1";
     private static final String DEFAULT_KEY = "";
     private final static Map<String, CosXmlService> cosServices = new HashMap<>();
     private final static Map<String, TransferManager> transferManagers = new HashMap<>();
@@ -155,12 +155,13 @@ public class CosClient extends UZModule {
         if (moduleContext.optInt("port") != 0) {
             serviceConfigBuilder.setPort(moduleContext.optInt("port"));
         }
-
-        if (moduleContext.optString("userAgent") != null) {
-            serviceConfigBuilder.setUserAgentExtended(moduleContext.optString("userAgent"));
-        }else{
-            serviceConfigBuilder.setUserAgentExtended("apicloud_android");
+        String userAgent = "apicloud_android";
+        if (!moduleContext.optString("userAgent").isEmpty()) {
+            userAgent += "-";
+            userAgent += moduleContext.optString("userAgent");
         }
+        userAgent = userAgent + "-" + CLIENT_VERSION;
+        serviceConfigBuilder.setUserAgentExtended(userAgent);
 
         return new CosXmlService(context,
                 serviceConfigBuilder.builder(), getQCloudCredentialProvider());
@@ -200,41 +201,41 @@ public class CosClient extends UZModule {
                     CountDownLatch countDownLatch = new CountDownLatch(1);
                     final Object[] result = new Object[1];
                     //此处调用有可能不是在主线程中 需要切换到主线程 因为调用flutter只能在主线程
-                   runMainThread(()->{
-                       execScript("refreshCredentail()", new ValueCallback() {
-                           @Override
-                           public void onReceiveValue(Object value) {
-                               if (value .getClass() == String.class){
-                                   String resultString = (String) value;
-                                   resultString = resultString.replaceAll("\"","");
-                                   String[] temps = resultString.split("&");
-                                   com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
-                                   for (String temp : temps) {
-                                       String[] infos = temp.split("=");
-                                       if(infos.length == 2){
-                                           if(infos[0].equals("secretID")){
-                                               jsonObject.put("secretID",infos[1]);
-                                           }
-                                           if(infos[0].equals("secretKey")){
-                                               jsonObject.put("secretKey",infos[1]);
-                                           }
-                                           if(infos[0].equals("token")){
-                                               jsonObject.put("token",infos[1]);
-                                           }
-                                           if(infos[0].equals("startDate")){
-                                               jsonObject.put("startDate",infos[1]);
-                                           }
-                                           if(infos[0].equals("expirationDate")){
-                                               jsonObject.put("expirationDate",infos[1]);
-                                           }
-                                       }
-                                   }
-                                   result[0] = jsonObject;
-                               }
-                               countDownLatch.countDown();
-                           }
-                       });
-                   });
+                    runMainThread(()->{
+                        execScript("refreshCredentail()", new ValueCallback() {
+                            @Override
+                            public void onReceiveValue(Object value) {
+                                if (value .getClass() == String.class){
+                                    String resultString = (String) value;
+                                    resultString = resultString.replaceAll("\"","");
+                                    String[] temps = resultString.split("&");
+                                    com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+                                    for (String temp : temps) {
+                                        String[] infos = temp.split("=");
+                                        if(infos.length == 2){
+                                            if(infos[0].equals("secretID")){
+                                                jsonObject.put("secretID",infos[1]);
+                                            }
+                                            if(infos[0].equals("secretKey")){
+                                                jsonObject.put("secretKey",infos[1]);
+                                            }
+                                            if(infos[0].equals("token")){
+                                                jsonObject.put("token",infos[1]);
+                                            }
+                                            if(infos[0].equals("startDate")){
+                                                jsonObject.put("startDate",infos[1]);
+                                            }
+                                            if(infos[0].equals("expirationDate")){
+                                                jsonObject.put("expirationDate",infos[1]);
+                                            }
+                                        }
+                                    }
+                                    result[0] = jsonObject;
+                                }
+                                countDownLatch.countDown();
+                            }
+                        });
+                    });
 
                     try {
                         countDownLatch.await();
